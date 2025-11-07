@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TagController;
+use App\Http\Controllers\Api\HealthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,9 @@ use App\Http\Controllers\Api\TagController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+// Health check endpoints (no authentication required)
+Route::get('health', [HealthController::class, 'check'])->name('api.health');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

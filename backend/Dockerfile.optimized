@@ -1,8 +1,8 @@
 # Optimized Dockerfile for Laravel Application
-# Using pre-built PHP image with extensions to avoid compilation issues
+# Using pre-built PHP image with extensions to avoid compilation
 
 # =============================================================================
-# Base PHP image with pre-compiled extensions  
+# Base PHP image with pre-compiled extensions
 # =============================================================================
 FROM serversideup/php:8.2-fpm-nginx AS base
 
@@ -11,7 +11,6 @@ USER root
 RUN apt-get update && apt-get install -y \
     supervisor \
     redis-tools \
-    curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -44,7 +43,7 @@ EXPOSE 80 9000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost/health || exit 1
+    CMD curl -f http://localhost/api/health || exit 1
 
 # Start supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
@@ -62,12 +61,10 @@ USER www-data
 RUN composer install --no-dev --optimize-autoloader --no-scripts \
     && composer dump-autoload --optimize
 
-# Laravel optimizations (skip if no .env exists)
-RUN if [ -f .env ]; then \
-        php artisan config:cache && \
-        php artisan route:cache && \
-        php artisan view:cache; \
-    fi
+# Laravel optimizations
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
 USER root
 
@@ -89,7 +86,7 @@ EXPOSE 80
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost/health || exit 1
+    CMD curl -f http://localhost/api/health || exit 1
 
 # Start supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

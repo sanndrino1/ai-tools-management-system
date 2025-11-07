@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  # Laravel Backend (Optimized with pre-built image)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-tools-backend
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/html
+      - backend-storage:/var/www/html/storage
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:your-secret-key-here
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=ai_tools
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=laravel_secret
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8000:80"
+    networks:
+      - ai-tools-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Next.js Frontend  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-tools-frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - frontend-modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    networks:
+      - ai-tools-network
+    depends_on:
+      - backend
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ai-tools-mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_secret
+      - MYSQL_DATABASE=ai_tools
+      - MYSQL_USER=laravel
+      - MYSQL_PASSWORD=laravel_secret
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - ai-tools-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ai-tools-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - ai-tools-network
+    command: redis-server --appendonly yes --requirepass redis_secret
+
+  # Nginx Load Balancer (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: ai-tools-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/sites:/etc/nginx/sites-available:ro
+    networks:
+      - ai-tools-network
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  backend-storage:
+    driver: local
+  frontend-modules:
+    driver: local
+
+networks:
+  ai-tools-network:
+    driver: bridge
