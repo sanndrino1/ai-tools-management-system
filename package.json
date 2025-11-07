@@ -1,0 +1,36 @@
+{
+  "name": "ai-tools-fullstack",
+  "version": "1.0.0",
+  "description": "Enterprise AI Tools Management System - Full Stack",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && php artisan serve",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && php artisan config:cache",
+    "build": "npm run build:frontend && npm run build:backend",
+    "setup:frontend": "cd frontend && npm install",
+    "setup:backend": "cd backend && composer install",
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "migrate": "cd backend && php artisan migrate",
+    "test:frontend": "cd frontend && npm run test",
+    "test:backend": "cd backend && php artisan test",
+    "test": "npm run test:backend && npm run test:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "nextjs",
+    "laravel",
+    "supabase",
+    "ai-tools",
+    "fullstack",
+    "enterprise"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@heroicons/react": "^2.2.0"
+  }
+}

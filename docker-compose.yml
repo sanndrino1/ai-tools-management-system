@@ -1,0 +1,214 @@
+version: '3.8'
+
+services:
+  # Laravel Backend API
+  laravel-app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-tools-laravel
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - laravel-vendor:/var/www/html/vendor
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=ai_tools
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=laravel_password
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - ai-tools-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Next.js Frontend
+  nextjs-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-tools-nextjs
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - nextjs-modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://nginx/api
+      - NEXT_PUBLIC_APP_URL=http://localhost
+    ports:
+      - "3000:3000"
+    networks:
+      - ai-tools-network
+    depends_on:
+      - laravel-app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ai-tools-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ai_tools
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - ai-tools-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "laravel", "-p$$MYSQL_PASSWORD"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Redis Cache & Sessions
+  redis:
+    image: redis:7-alpine
+    container_name: ai-tools-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - "6379:6379"
+    networks:
+      - ai-tools-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Web Server & Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: ai-tools-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/sites:/etc/nginx/conf.d:ro
+      - ./backend/public:/var/www/html/public:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - ai-tools-network
+    depends_on:
+      - laravel-app
+      - nextjs-app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Laravel Queue Worker
+  laravel-queue:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-tools-queue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - laravel-vendor:/var/www/html/vendor
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=ai_tools
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=laravel_password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+    networks:
+      - ai-tools-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Laravel Scheduler (Cron Jobs)
+  laravel-scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ai-tools-scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - laravel-vendor:/var/www/html/vendor
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=ai_tools
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=laravel_password
+    command: crond -f -l 2
+    networks:
+      - ai-tools-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+# Named Volumes for Data Persistence
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  laravel-vendor:
+    driver: local
+  nextjs-modules:
+    driver: local
+
+# Custom Network
+networks:
+  ai-tools-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

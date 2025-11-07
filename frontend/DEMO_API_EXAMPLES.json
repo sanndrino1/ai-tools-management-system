@@ -1,0 +1,423 @@
+{
+  "demo_api_responses": {
+    "get_ai_tools": {
+      "success": true,
+      "data": [
+        {
+          "id": 1,
+          "name": "ChatGPT",
+          "slug": "chatgpt",
+          "description": "Напреднал AI асистент за текстова генерация, отговори на въпроси и помощ при програмиране",
+          "detailed_description": "ChatGPT е мощен езиков модел, който може да помага при писане, кодиране, анализ и творчески задачи.",
+          "website_url": "https://chat.openai.com",
+          "documentation_url": "https://platform.openai.com/docs",
+          "logo_url": null,
+          "pricing_type": "freemium",
+          "pricing_details": {
+            "free": "20 съобщения в час",
+            "plus": "$20/месец за неограничен достъп"
+          },
+          "difficulty_level": "beginner",
+          "features": ["Текстова генерация", "Code assistance", "Q&A", "Превод", "Обобщения"],
+          "use_cases": ["Писане на статии", "Помощ при кодиране", "Отговори на въпроси", "Създаване на съдържание"],
+          "is_api_available": true,
+          "integration_complexity": "low",
+          "learning_curve": "easy",
+          "support_quality": "professional",
+          "security_rating": 4,
+          "performance_rating": 5,
+          "user_rating": 4.8,
+          "total_reviews": 1247,
+          "popularity_score": 95,
+          "verified": true,
+          "featured": true,
+          "status": "active",
+          "created_at": "2024-01-01T00:00:00.000000Z",
+          "updated_at": "2024-01-01T00:00:00.000000Z",
+          "categories": [
+            {
+              "id": 1,
+              "name": "Писане и редактиране",
+              "slug": "writing-editing",
+              "icon": "📝"
+            },
+            {
+              "id": 3,
+              "name": "Програмиране",
+              "slug": "programming", 
+              "icon": "💻"
+            }
+          ],
+          "roles": [
+            {
+              "id": 1,
+              "name": "owner",
+              "display_name": "Собственик",
+              "icon": "👑",
+              "pivot": {
+                "relevance_score": 90
+              }
+            },
+            {
+              "id": 2,
+              "name": "pm",
+              "display_name": "Проект Мениджър",
+              "icon": "📋",
+              "pivot": {
+                "relevance_score": 85
+              }
+            },
+            {
+              "id": 3,
+              "name": "backend",
+              "display_name": "Backend разработчик",
+              "icon": "⚙️",
+              "pivot": {
+                "relevance_score": 80
+              }
+            }
+          ],
+          "tags": [
+            {
+              "id": 1,
+              "name": "AI",
+              "slug": "ai"
+            },
+            {
+              "id": 2,
+              "name": "Текст",
+              "slug": "text"
+            },
+            {
+              "id": 3,
+              "name": "Кодиране",
+              "slug": "coding"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Midjourney",
+          "slug": "midjourney",
+          "description": "AI инструмент за генериране на високо качествени изображения от текстови описания",
+          "detailed_description": "Midjourney е един от най-добрите AI инструменти за създаване на артистични и реалистични изображения.",
+          "website_url": "https://midjourney.com",
+          "documentation_url": null,
+          "logo_url": null,
+          "pricing_type": "paid",
+          "pricing_details": {
+            "basic": "$10/месец за 200 изображения",
+            "standard": "$30/месец за неограничени изображения"
+          },
+          "difficulty_level": "intermediate",
+          "features": ["Image generation", "Художествени стилове", "Високо качество", "Варианти"],
+          "use_cases": ["Дизайн концепции", "Илюстрации", "Маркетинг материали", "Креативни проекти"],
+          "is_api_available": false,
+          "integration_complexity": "medium",
+          "learning_curve": "moderate",
+          "support_quality": "community",
+          "security_rating": 4,
+          "performance_rating": 5,
+          "user_rating": 4.7,
+          "total_reviews": 856,
+          "popularity_score": 88,
+          "verified": true,
+          "featured": true,
+          "status": "active",
+          "categories": [
+            {
+              "id": 2,
+              "name": "Дизайн и креативност",
+              "slug": "design-creativity",
+              "icon": "🎨"
+            },
+            {
+              "id": 6,
+              "name": "Обработка на изображения",
+              "slug": "image-processing",
+              "icon": "🖼️"
+            }
+          ],
+          "roles": [
+            {
+              "id": 6,
+              "name": "designer",
+              "display_name": "Дизайнер",
+              "icon": "✨",
+              "pivot": {
+                "relevance_score": 95
+              }
+            },
+            {
+              "id": 2,
+              "name": "pm",
+              "display_name": "Проект Мениджър",
+              "icon": "📋",
+              "pivot": {
+                "relevance_score": 75
+              }
+            }
+          ],
+          "tags": [
+            {
+              "id": 1,
+              "name": "AI",
+              "slug": "ai"
+            },
+            {
+              "id": 4,
+              "name": "Изображения",
+              "slug": "images"
+            },
+            {
+              "id": 5,
+              "name": "Дизайн",
+              "slug": "design"
+            }
+          ]
+        }
+      ],
+      "pagination": {
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 12,
+        "total": 2,
+        "from": 1,
+        "to": 2
+      }
+    },
+    "get_categories": {
+      "success": true,
+      "data": [
+        {
+          "id": 1,
+          "name": "Писане и редактиране",
+          "slug": "writing-editing",
+          "icon": "📝",
+          "description": "AI инструменти за създаване и редактиране на текстово съдържание",
+          "tools_count": 1
+        },
+        {
+          "id": 2,
+          "name": "Дизайн и креативност",
+          "slug": "design-creativity",
+          "icon": "🎨",
+          "description": "AI инструменти за дизайн, изкуство и креативни проекти",
+          "tools_count": 1
+        },
+        {
+          "id": 3,
+          "name": "Програмиране",
+          "slug": "programming",
+          "icon": "💻",
+          "description": "AI инструменти за разработка на софтуер и кодиране",
+          "tools_count": 2
+        },
+        {
+          "id": 4,
+          "name": "Анализ на данни",
+          "slug": "data-analysis",
+          "icon": "📊",
+          "description": "AI инструменти за анализ, визуализация и обработка на данни",
+          "tools_count": 1
+        },
+        {
+          "id": 5,
+          "name": "Говор и аудио",
+          "slug": "speech-audio",
+          "icon": "🗣️",
+          "description": "AI инструменти за обработка на аудио и генериране на глас",
+          "tools_count": 1
+        },
+        {
+          "id": 6,
+          "name": "Обработка на изображения",
+          "slug": "image-processing",
+          "icon": "🖼️",
+          "description": "AI инструменти за редактиране и генериране на изображения",
+          "tools_count": 1
+        }
+      ]
+    },
+    "get_roles": {
+      "success": true,
+      "data": [
+        {
+          "id": 1,
+          "name": "owner",
+          "display_name": "Собственик",
+          "icon": "👑",
+          "description": "Пълни права за управление на системата",
+          "permissions": ["create", "read", "update", "delete", "manage"]
+        },
+        {
+          "id": 2,
+          "name": "pm",
+          "display_name": "Проект Мениджър",
+          "icon": "📋",
+          "description": "Управление на проекти и координация на екипа",
+          "permissions": ["create", "read", "update"]
+        },
+        {
+          "id": 3,
+          "name": "backend",
+          "display_name": "Backend разработчик",
+          "icon": "⚙️",
+          "description": "Разработка на сървърна логика и API",
+          "permissions": ["read"]
+        },
+        {
+          "id": 4,
+          "name": "frontend",
+          "display_name": "Frontend разработчик",
+          "icon": "🎨",
+          "description": "Разработка на потребителски интерфейси",
+          "permissions": ["read"]
+        },
+        {
+          "id": 5,
+          "name": "qa",
+          "display_name": "QA специалист",
+          "icon": "🐛",
+          "description": "Тестване и осигуряване на качеството",
+          "permissions": ["read"]
+        },
+        {
+          "id": 6,
+          "name": "designer",
+          "display_name": "Дизайнер",
+          "icon": "✨",
+          "description": "UX/UI дизайн и визуални концепции",
+          "permissions": ["read"]
+        }
+      ]
+    },
+    "search_example": {
+      "query": "програмиране",
+      "success": true,
+      "data": [
+        {
+          "id": 1,
+          "name": "ChatGPT",
+          "description": "Напреднал AI асистент за текстова генерация, отговори на въпроси и помощ при програмиране",
+          "categories": ["Писане и редактиране", "Програмиране"],
+          "relevance_score": 95
+        },
+        {
+          "id": 3,
+          "name": "GitHub Copilot",
+          "description": "AI асистент за програмиране, който предлага код suggestions в реално време",
+          "categories": ["Програмиране"],
+          "relevance_score": 98
+        }
+      ]
+    },
+    "filter_by_role_example": {
+      "role": "designer",
+      "success": true,
+      "data": [
+        {
+          "id": 2,
+          "name": "Midjourney",
+          "description": "AI инструмент за генериране на високо качествени изображения от текстови описания",
+          "role_relevance": 95,
+          "categories": ["Дизайн и креативност", "Обработка на изображения"]
+        }
+      ]
+    }
+  },
+  "usage_scenarios": {
+    "scenario_1_pm_adds_tool": {
+      "step": "PM добавя нов AI инструмент",
+      "request": {
+        "method": "POST",
+        "url": "/v2/ai-tools",
+        "headers": {
+          "Authorization": "Bearer pm_token_here",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Notion AI",
+          "description": "AI асистент вграден в Notion за писане и организация",
+          "detailed_description": "Notion AI помага за писане на съдържание, обобщения и организация на информация директно в Notion workspace.",
+          "category_ids": [1, 4],
+          "website_url": "https://notion.so/ai",
+          "pricing_type": "freemium",
+          "difficulty_level": "beginner",
+          "features": ["Писане", "Обобщения", "Организация", "Колаборация"],
+          "use_cases": ["Документация", "Планиране", "Отчети", "Бележки"],
+          "tags": ["AI", "Productivity", "Писане", "Организация"],
+          "role_relevance": {
+            "owner": 80,
+            "pm": 90,
+            "backend": 60,
+            "frontend": 65,
+            "qa": 70,
+            "designer": 55
+          }
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "AI инструментът е създаден успешно",
+        "data": {
+          "id": 6,
+          "name": "Notion AI",
+          "slug": "notion-ai",
+          "status": "active",
+          "created_at": "2024-01-01T12:00:00.000000Z"
+        }
+      }
+    },
+    "scenario_2_backend_searches": {
+      "step": "Backend разработчик търси инструменти за своята роля",
+      "request": {
+        "method": "GET",
+        "url": "/v2/ai-tools?role=backend&sort_by=relevance",
+        "headers": {
+          "Authorization": "Bearer backend_token_here"
+        }
+      },
+      "response": {
+        "success": true,
+        "data": [
+          {
+            "id": 3,
+            "name": "GitHub Copilot",
+            "role_relevance": 95,
+            "categories": ["Програмиране"]
+          },
+          {
+            "id": 1,
+            "name": "ChatGPT", 
+            "role_relevance": 80,
+            "categories": ["Писане и редактиране", "Програмиране"]
+          }
+        ]
+      }
+    },
+    "scenario_3_designer_filters": {
+      "step": "Дизайнер филтрира по категория 'Дизайн и креативност'",
+      "request": {
+        "method": "GET",
+        "url": "/v2/ai-tools?category_id=2&role=designer",
+        "headers": {
+          "Authorization": "Bearer designer_token_here"
+        }
+      },
+      "response": {
+        "success": true,
+        "data": [
+          {
+            "id": 2,
+            "name": "Midjourney",
+            "role_relevance": 95,
+            "categories": ["Дизайн и креативност", "Обработка на изображения"],
+            "pricing_type": "paid",
+            "difficulty_level": "intermediate"
+          }
+        ]
+      }
+    }
+  }
+}

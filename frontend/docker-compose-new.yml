@@ -1,0 +1,188 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ekipen_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ekipen_hub
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: ekipen_user
+      MYSQL_PASSWORD: ekipen_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - ekipen_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+      start_period: 30s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ekipen_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ekipen_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 10s
+    command: redis-server --appendonly yes --requirepass redis_password
+
+  # Laravel Backend API
+  laravel:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ekipen_laravel
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ekipen_hub
+      DB_USERNAME: ekipen_user
+      DB_PASSWORD: ekipen_pass
+      REDIS_HOST: redis
+      REDIS_PASSWORD: redis_password
+      REDIS_PORT: 6379
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_KEY: base64:YourAppKeyHere
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      CACHE_DRIVER: redis
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+      - laravel_storage:/var/www/html/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ekipen_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 60s
+
+  # Next.js Frontend
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: ekipen_nextjs
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://laravel:8000/api
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      laravel:
+        condition: service_healthy
+    networks:
+      - ekipen_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+      start_period: 30s
+
+  # Queue Worker (Laravel)
+  queue:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ekipen_queue
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ekipen_hub
+      DB_USERNAME: ekipen_user
+      DB_PASSWORD: ekipen_pass
+      REDIS_HOST: redis
+      REDIS_PASSWORD: redis_password
+      REDIS_PORT: 6379
+      QUEUE_CONNECTION: redis
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ekipen_network
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    healthcheck:
+      test: ["CMD", "php", "artisan", "queue:work", "--stop-when-empty"]
+      timeout: 30s
+      retries: 3
+      interval: 60s
+
+  # Nginx Load Balancer/Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: ekipen_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      nextjs:
+        condition: service_healthy
+      laravel:
+        condition: service_healthy
+    networks:
+      - ekipen_network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  laravel_storage:
+    driver: local
+
+networks:
+  ekipen_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
