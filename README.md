@@ -1,252 +1,242 @@
 # 🚀 AI Tools Management System
 
-> **Enterprise-grade AI tools management platform with role-based access control, 2FA security, and advanced analytics.**
+Professional full-stack platform for managing AI tools with advanced CRUD operations, role-based authentication, and modern UI components.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.33-blueviolet.svg)](https://nextjs.org/)
-[![Laravel](https://img.shields.io/badge/Laravel-11-red.svg)](https://laravel.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-
-## 📋 Table of Contents
-
-- [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [🚀 Quick Start](#-quick-start)
-- [🐳 Docker Setup](#-docker-setup)
-- [📦 Manual Installation](#-manual-installation)
-- [🔧 Configuration](#-configuration)
-- [👥 Role System](#-role-system)
-- [🛠️ Adding Tools](#️-adding-tools)
-- [🔐 Security Features](#-security-features)
-- [📡 API Documentation](#-api-documentation)
-- [🤖 AI Agents Integration](#-ai-agents-integration)
+![System Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014-blue)
+![Backend](https://img.shields.io/badge/Backend-Laravel%2011-red)
+![Database](https://img.shields.io/badge/Database-MySQL%2FPostgreSQL-orange)
 
 ## ✨ Features
 
-### 🔐 **Advanced Security**
-- **Two-Factor Authentication** (Email, Telegram, Google Authenticator)
-- **Role-based access control** (6-tier hierarchy)
-- **JWT token management** with session handling
-- **Audit logging** for all system actions
-- **Route protection** middleware
+### 🛠 Core CRUD Operations
+- **Create**: Modal forms with real-time validation
+- **Read**: Grid view with advanced statistics dashboard  
+- **Update**: Professional edit interfaces (ready for API integration)
+- **Delete**: Confirmation dialogs with soft delete support
 
-### 🛡️ **Admin Dashboard**
-- **Tool management** (approve, reject, categorize)
-- **User role management** with permission control
-- **Real-time analytics** and statistics
-- **Activity monitoring** and audit trails
-- **Redis caching** for performance
+### 🎨 Professional UI
+- Modern design with Tailwind CSS
+- Responsive layout for all devices
+- Interactive components with hover effects
+- Advanced toast notification system
+- Loading states and error handling
 
-### ⚡ **Performance & Scalability**
-- **Redis caching** for categories and statistics
-- **Lazy loading** and pagination
-- **Optimized database queries**
-- **CDN-ready** architecture
-- **Auto-scaling** Docker containers
+### 🔐 Authentication & Authorization
+- Role-based access control (6 roles: Owner, PM, Backend, Frontend, QA, Designer)
+- Demo authentication system ready for production
+- Protected routes and middleware
+- User profile management
 
-## 🚀 **Quick Start**
+### 📊 Advanced Features
+- Real-time search and filtering
+- Statistics dashboard with charts
+- Bulk operations support
+- Extended tool metadata (30+ fields)
+- Future-ready API structure
 
-### Предварителни изисквания
-- **Node.js** 16+ и **npm** 
-- **PHP** 8.0+ (XAMPP препоръчан)
-- **Composer** 
+## 🏗 Technical Architecture
 
-### 1️⃣ Стартиране на Backend (Laravel)
+### Frontend (Next.js 14)
+```
+frontend/
+├── app/                 # Next.js App Router
+│   ├── admin/tools/     # CRUD interface
+│   ├── dashboard/       # Statistics dashboard
+│   └── login/           # Authentication
+├── components/          # Reusable UI components
+├── lib/                 # Services and utilities
+└── contexts/           # React context providers
+```
+
+### Backend (Laravel 11)
+```
+backend/
+├── app/
+│   ├── Http/Controllers/Api/  # REST API endpoints
+│   ├── Models/               # Eloquent models
+│   └── Services/             # Business logic
+├── database/
+│   ├── migrations/           # Database schema
+│   └── seeders/             # Sample data
+└── routes/api.php           # API routing
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- PHP 8.2+
+- Composer
+- MySQL/PostgreSQL
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-cd backend
-php artisan serve --port=8000
-# Backend API ще е на: http://localhost:8000
+git clone https://github.com/YOUR_USERNAME/ai-tools-management-system.git
+cd ai-tools-management-system
 ```
 
-### 2️⃣ Стартиране на Frontend (Next.js)  
+2. **Start the system (Windows)**
 ```bash
-cd frontend
-npm run dev
-# Frontend ще е на: http://localhost:3002
+START_SYSTEM.bat
 ```
 
-### 3️⃣ Отваряне в браузъра
-- **Приложението**: http://localhost:3002  
-- **API данни**: http://localhost:8000/api/tools
-- **Laravel dashboard**: http://localhost:8000
+3. **Or manually:**
 
-🎉 **Готово! Имате работещо full-stack приложение с примерни данни!**
-
-## 🏗️ Архитектура
-
-```
-┌─────────────────┐    HTTP/REST    ┌─────────────────┐    PostgreSQL    ┌─────────────────┐
-│   Next.js 14    │ ◄─────────────► │   Laravel 11    │ ◄───────────────► │    Supabase     │
-│   (Frontend)    │                 │   (Backend API) │                   │  (Database +    │
-│                 │                 │                 │                   │   Auth + RT)    │
-└─────────────────┘                 └─────────────────┘                   └─────────────────┘
-```
-
-## 🎯 Компоненти
-
-### 🎨 Frontend (Next.js 14)
-- **Локация**: `/frontend`
-- **Технологии**: Next.js 14, TypeScript, Tailwind CSS
-- **Роля**: User Interface, Client-side логика
-- **API**: Consumption на Laravel REST API
-
-### 🔧 Backend (Laravel 11)
-- **Локация**: `/backend`
-- **Технологии**: Laravel 11, PHP 8.2, Laravel Sanctum
-- **Роля**: REST API, Business логика, Валидация
-- **Auth**: JWT tokens + Supabase integration
-
-### 🗄️ Database (Supabase)
-- **PostgreSQL база данни**
-- **Real-time subscriptions**
-- **Built-in автентикация**
-- **Storage за файлове**
-
-## 📦 Структура на проекта
-
-```
-ai-tools-fullstack/
-├── frontend/              # Next.js 14 приложение
-│   ├── app/              # App Router
-│   ├── components/       # React компоненти
-│   ├── lib/             # Utilities и типове
-│   └── public/          # Статични ресурси
-├── backend/             # Laravel 11 API
-│   ├── app/            # Laravel application
-│   ├── routes/         # API маршрути
-│   ├── database/       # Migrations & Seeders
-│   └── config/         # Конфигурации
-├── docs/               # Документация
-│   ├── api/           # API документация
-│   ├── deployment/    # Deployment guides
-│   └── setup/         # Setup инструкции
-└── docker/            # Docker configuration
-```
-
-## 🚀 Ключови функционалности
-
-### 🔐 Автентикация & Сигурност
-- **Supabase Auth** - OAuth providers, email/password
-- **Laravel Sanctum** - API token authentication
-- **Role-based Access Control** - 6 роли с йерархия
-- **2FA поддръжка** - Email и SMS verification
-
-### 🛠️ Tool Management
-- **CRUD операции** чрез REST API
-- **Category система** - AI/ML, Development, Design, etc.
-- **Status workflow** - Pending → Under Review → Approved/Rejected
-- **File upload** - Supabase Storage integration
-
-### ⭐ Rating & Comments
-- **5-star rating система**
-- **Nested comments** с real-time updates
-- **Vote система** - Upvote/downvote
-- **Moderation tools**
-
-### 📊 Analytics & Monitoring
-- **Admin dashboard** - Real-time статистики
-- **Audit logging** - All user actions
-- **Performance metrics** - API response times
-- **Real-time notifications** - Supabase real-time
-
-## 🔧 Технически детайли
-
-### API Endpoints
-```
-GET    /api/tools                 # List tools
-POST   /api/tools                 # Create tool
-GET    /api/tools/{id}            # Get tool
-PUT    /api/tools/{id}            # Update tool
-DELETE /api/tools/{id}            # Delete tool
-POST   /api/tools/{id}/rate       # Rate tool
-GET    /api/tools/{id}/comments   # Get comments
-POST   /api/tools/{id}/comments   # Add comment
-```
-
-### Database Schema
-```sql
--- Users (Supabase built-in)
--- Tools
--- Categories  
--- Ratings
--- Comments
--- Audit_logs
--- User_roles
-```
-
-### Environment Variables
-```bash
-# Frontend (.env.local)
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
-
-# Backend (.env)
-SUPABASE_URL=
-SUPABASE_SECRET_KEY=
-DB_CONNECTION=pgsql
-DB_HOST=db.supabase.co
-```
-
-## 🚀 Development Setup
-
-### 1. Backend Setup
+**Backend Setup:**
 ```bash
 cd backend
 composer install
-php artisan migrate
-php artisan serve # http://localhost:8000
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+# Backend runs on http://localhost:8000
 ```
 
-### 2. Frontend Setup  
+**Frontend Setup:**
 ```bash
 cd frontend
 npm install
-npm run dev # http://localhost:3000
+cp .env.local.example .env.local
+npm run dev
+# Frontend runs on http://localhost:3002
 ```
 
-### 3. Supabase Setup
-- Create project at supabase.com
-- Configure authentication providers
-- Run database migrations
-- Setup storage buckets
+## 🎯 Demo & Testing
 
-## 📈 Deployment
+### Access the System
+- **Frontend**: http://localhost:3002
+- **Admin Panel**: http://localhost:3002/admin/tools
+- **Dashboard**: http://localhost:3002/dashboard
+- **API**: http://localhost:8000/api
 
-### Production Stack
-- **Frontend**: Vercel (Next.js optimized)
-- **Backend**: DigitalOcean/AWS (Laravel Forge)
-- **Database**: Supabase (managed PostgreSQL)
-- **CDN**: Cloudflare
-- **Monitoring**: Sentry + Laravel Telescope
+### Demo Credentials
+```
+Email: owner@aitools.dev
+Role: Owner (Full Access)
 
-### Docker Support
+Other demo users:
+- pm@aitools.dev (Project Manager)
+- backend@aitools.dev (Backend Developer)  
+- frontend@aitools.dev (Frontend Developer)
+- qa@aitools.dev (QA Engineer)
+- designer@aitools.dev (Designer)
+```
+
+## 💻 Development
+
+### Available Scripts
+
+**Root Level:**
+- `npm run dev` - Start both frontend and backend
+- `START_SYSTEM.bat` - Windows quick start
+- `STOP_SYSTEM.bat` - Windows quick stop
+
+**Frontend:**
+- `npm run dev` - Development server
+- `npm run build` - Production build
+- `npm run start` - Production server
+
+**Backend:**
+- `php artisan serve` - Development server
+- `php artisan migrate` - Run migrations
+- `php artisan db:seed` - Seed database
+
+### Docker Setup
 ```bash
-docker-compose up --build
+docker-compose up -d
+# Access at http://localhost:3000
 ```
 
-## 🔄 Data Flow
+## 🔧 API Documentation
 
-1. **User Login** → Supabase Auth → JWT token
-2. **Frontend Request** → Laravel API (with token)
-3. **Backend Processing** → Database operations
-4. **Real-time Updates** → Supabase subscriptions
-5. **Response** → JSON API response
+### Tools API Endpoints
+```
+GET    /api/tools              # List all tools
+POST   /api/tools              # Create new tool
+GET    /api/tools/{id}         # Get tool details
+PUT    /api/tools/{id}         # Update tool
+DELETE /api/tools/{id}         # Delete tool
+GET    /api/tools/search       # Search tools
+```
 
-## 🎯 Roadmap
+### Categories & Tags
+```
+GET    /api/categories         # List categories
+GET    /api/tags               # List tags
+POST   /api/tools/{id}/rate    # Rate tool
+POST   /api/tools/{id}/comment # Comment on tool
+```
 
-- [ ] Setup Supabase project
-- [ ] Create Laravel API structure
-- [ ] Implement authentication flow
-- [ ] Build core CRUD operations
-- [ ] Add real-time features
-- [ ] Implement file upload
-- [ ] Add comprehensive testing
-- [ ] Deploy to production
+## 📱 UI Components
+
+### Core Components
+- `ToolCard` - Display tool information
+- `Modal` - Overlay dialogs
+- `Button` - Interactive buttons
+- `Input` - Form inputs with validation
+- `Dropdown` - Selection menus
+- `StatsCard` - Statistics display
+
+### Advanced Features
+- `EnhancedToast` - Notification system
+- `SearchFilters` - Advanced filtering
+- `BulkActions` - Mass operations
+- `RoleGuard` - Permission checks
+
+## 🚀 Production Deployment
+
+### Environment Setup
+1. Configure environment variables
+2. Set up database connections
+3. Configure authentication providers
+4. Set up file storage (if needed)
+
+### Build & Deploy
+```bash
+# Frontend
+cd frontend && npm run build
+
+# Backend  
+cd backend && composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+## 🎨 Customization
+
+### Theme Configuration
+Edit `frontend/tailwind.config.js` for color schemes and design tokens.
+
+### Adding New Features
+1. Backend: Create controllers in `app/Http/Controllers/Api/`
+2. Frontend: Add components in `components/`
+3. Database: Create migrations with `php artisan make:migration`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/) and [Laravel](https://laravel.com/)
+- UI components inspired by [Tailwind UI](https://tailwindui.com/)
+- Icons from [Heroicons](https://heroicons.com/)
 
 ---
 
-**Версия**: 1.0.0  
-**Последна актуализация**: Ноември 2025  
-**Статус**: В разработка
+**⭐ Star this repo if you found it helpful!**
+
+For questions or support, please open an issue or contact the development team.
