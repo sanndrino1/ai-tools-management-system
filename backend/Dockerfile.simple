@@ -1,0 +1,55 @@
+# Simplified Laravel Dockerfile for reliable Docker startup
+FROM php:8.2-fpm-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    curl \
+    zip \
+    unzip \
+    git \
+    mysql-client
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Development Stage
+FROM base AS development
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy composer files
+COPY composer.json composer.lock ./
+
+# Install dependencies
+RUN composer install --optimize-autoloader
+
+# Copy application code
+COPY . .
+
+# Create Laravel user
+RUN addgroup -g 1001 laravel
+RUN adduser -S -G laravel -u 1001 laravel
+
+# Set permissions
+RUN chown -R laravel:laravel /var/www/html
+RUN chmod -R 755 storage bootstrap/cache
+
+# Copy configurations
+COPY docker/nginx/simple.conf /etc/nginx/nginx.conf
+COPY docker/supervisor/simple.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost/api/health || exit 1
+
+# Start supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

@@ -21,20 +21,28 @@ FROM base AS development
 
 WORKDIR /app
 
-# Install dependencies
+# Create next.js user FIRST (before copying files)
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+# Install helper to drop privileges at runtime
+RUN apk add --no-cache su-exec
+
+# Install dependencies as root (copy without chown to keep bind-mount friendly)
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Copy source code
+# Copy source code (when bind-mounted during development, runtime entrypoint will fix ownership)
 COPY . .
 
-# Create next.js user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Ensure ownership is sane inside image (may be overridden by bind mounts at runtime)
+RUN chown -R nextjs:nodejs /app || true
 
-# Set permissions
-RUN chown -R nextjs:nodejs /app
-USER nextjs
+# Add entrypoint which will chown the mounted files and drop privileges to `nextjs`
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# NOTE: we intentionally keep the default user as root in development stage so the entrypoint
+# can perform chown on bind-mounted volumes, then it will exec the process as `nextjs`.
 
 # Expose port
 EXPOSE 3000
@@ -84,20 +92,24 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
-# Create next.js user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create next.js user FIRST
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# Copy built application from builder stage
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Copy built application from builder stage with correct ownership
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy package.json for metadata
-COPY --from=builder /app/package.json ./package.json
+# Copy package.json for metadata with correct ownership
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
-# Set permissions
-RUN chown -R nextjs:nodejs /app
+# Ensure all permissions are correct and secure
+RUN chown -R nextjs:nodejs /app && \
+    chmod -R 755 /app && \
+    chmod -R 644 /app/.next/static
+
+# Switch to non-root user
 USER nextjs
 
 # Expose port

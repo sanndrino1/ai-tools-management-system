@@ -23,21 +23,30 @@ WORKDIR /var/www/html
 # =============================================================================
 FROM base AS development
 
-# Copy application code
+# Ensure www-data user has correct permissions
+RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
+
+# Copy application code with correct ownership
 COPY --chown=www-data:www-data . .
 
-# Install Composer dependencies
+# Install Composer dependencies as www-data user
 USER www-data
 RUN composer install --optimize-autoloader
 
-# Copy configuration files
+# Switch back to root for configuration
 USER root
+
+# Copy configuration files
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/nginx/default.conf /etc/nginx/sites-available/default
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 storage bootstrap/cache
+# Set comprehensive permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    chmod -R 775 storage bootstrap/cache && \
+    chmod -R 664 storage/logs && \
+    find storage -type d -exec chmod 775 {} \; && \
+    find bootstrap/cache -type d -exec chmod 775 {} \;
 
 # Expose ports
 EXPOSE 80 9000
@@ -54,13 +63,16 @@ CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 # =============================================================================
 FROM base AS production
 
-# Copy application code
+# Ensure www-data user has correct permissions
+RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
+
+# Copy application code with correct ownership
 COPY --chown=www-data:www-data . .
 
-# Install production dependencies
+# Install production dependencies as www-data user
 USER www-data
-RUN composer install --no-dev --optimize-autoloader --no-scripts \
-    && composer dump-autoload --optimize
+RUN composer install --no-dev --optimize-autoloader --no-scripts && \
+    composer dump-autoload --optimize
 
 # Laravel optimizations (skip if no .env exists)
 RUN if [ -f .env ]; then \
@@ -69,20 +81,26 @@ RUN if [ -f .env ]; then \
         php artisan view:cache; \
     fi
 
+# Switch back to root for system configuration
 USER root
 
 # Remove development files
-RUN rm -rf tests docker .git \
-    && rm -f docker-compose* README.md
+RUN rm -rf tests docker .git && \
+    rm -f docker-compose* README.md
 
-# Copy production configuration
-COPY docker/supervisor/supervisord.prod.conf /etc/supervisor/conf.d/supervisord.conf
-COPY docker/nginx/nginx.prod.conf /etc/nginx/sites-available/default
+# Copy production configuration files (fallback to development configs if production not found)
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/nginx/default.conf /etc/nginx/sites-available/default
 
-# Set final permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 storage bootstrap/cache \
-    && chmod -R 644 /var/www/html
+# Set comprehensive production permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    chmod -R 775 storage bootstrap/cache && \
+    chmod -R 664 storage/logs && \
+    find /var/www/html -type f -exec chmod 644 {} \; && \
+    find /var/www/html -type d -exec chmod 755 {} \; && \
+    find storage -type d -exec chmod 775 {} \; && \
+    find bootstrap/cache -type d -exec chmod 775 {} \;
 
 # Expose port
 EXPOSE 80

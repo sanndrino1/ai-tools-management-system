@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\HealthController;
+use App\Http\Controllers\TwoFactorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,10 @@ Route::prefix('v1')->group(function () {
     // Tags
     Route::get('tags', [TagController::class, 'index'])->name('api.tags.index');
     Route::get('tags/{tag:slug}', [TagController::class, 'show'])->name('api.tags.show');
+
+    // 2FA Authentication (no auth required)
+    Route::post('2fa/send-code', [TwoFactorController::class, 'sendCode'])->name('api.2fa.send');
+    Route::post('2fa/verify-code', [TwoFactorController::class, 'verifyCode'])->name('api.2fa.verify');
 });
 
 // Protected API routes (authentication required)
@@ -54,16 +59,12 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::put('tools/{tool}', [ToolController::class, 'update'])->name('api.tools.update');
     Route::delete('tools/{tool}', [ToolController::class, 'destroy'])->name('api.tools.destroy');
     
-    // 2FA routes
+    // 2FA Management routes (authenticated users)
     Route::prefix('2fa')->group(function () {
-        Route::get('status', [App\Http\Controllers\Api\TwoFactorController::class, 'status'])->name('api.2fa.status');
-        Route::post('setup/email', [App\Http\Controllers\Api\TwoFactorController::class, 'setupEmail'])->name('api.2fa.setup.email');
-        Route::post('setup/telegram', [App\Http\Controllers\Api\TwoFactorController::class, 'setupTelegram'])->name('api.2fa.setup.telegram');
-        Route::post('setup/google-authenticator', [App\Http\Controllers\Api\TwoFactorController::class, 'setupGoogleAuthenticator'])->name('api.2fa.setup.google');
-        Route::post('send-code', [App\Http\Controllers\Api\TwoFactorController::class, 'sendCode'])->name('api.2fa.send-code');
-        Route::post('verify-code', [App\Http\Controllers\Api\TwoFactorController::class, 'verifyCode'])->name('api.2fa.verify-code');
-        Route::post('disable', [App\Http\Controllers\Api\TwoFactorController::class, 'disable'])->name('api.2fa.disable');
-        Route::post('backup-codes/regenerate', [App\Http\Controllers\Api\TwoFactorController::class, 'regenerateBackupCodes'])->name('api.2fa.backup-codes.regenerate');
+        Route::get('status', [TwoFactorController::class, 'status'])->name('api.2fa.status');
+        Route::post('enable', [TwoFactorController::class, 'enable'])->name('api.2fa.enable');
+        Route::post('disable', [TwoFactorController::class, 'disable'])->name('api.2fa.disable');
+        Route::post('backup-codes/regenerate', [TwoFactorController::class, 'regenerateBackupCodes'])->name('api.2fa.backup-codes.regenerate');
     });
 
     // Admin only routes

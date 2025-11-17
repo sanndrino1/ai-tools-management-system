@@ -63,22 +63,13 @@ export default function Dashboard() {
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <button 
-                onClick={() => router.push('/tools')}
-                className="w-full text-left px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg"
-              >
+              <button className="w-full text-left px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg">
                 View Tools
               </button>
-              <button 
-                onClick={() => router.push('/tools/add')}
-                className="w-full text-left px-4 py-2 bg-green-50 hover:bg-green-100 rounded-lg"
-              >
+              <button className="w-full text-left px-4 py-2 bg-green-50 hover:bg-green-100 rounded-lg">
                 Add New Tool
               </button>
-              <button 
-                onClick={() => router.push('/settings')}
-                className="w-full text-left px-4 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg"
-              >
+              <button className="w-full text-left px-4 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg">
                 Settings
               </button>
             </div>

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('activity_log', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('log_name')->nullable()->index();
+            $table->string('log_name')->nullable();
             $table->text('description');
             $table->nullableUuidMorphs('subject', 'subject');
             $table->nullableUuidMorphs('causer', 'causer');

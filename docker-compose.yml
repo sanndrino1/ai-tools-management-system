@@ -44,11 +44,12 @@ services:
   nextjs-app:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.permissions
       target: development
     container_name: ai-tools-nextjs
     restart: unless-stopped
     volumes:
+      # Use bind mount for development hot reload
       - ./frontend:/app
       - nextjs-modules:/app/node_modules
     environment:
@@ -61,6 +62,9 @@ services:
       - ai-tools-network
     depends_on:
       - laravel-app
+    # Run as root initially to fix permissions, then switch to nextjs user
+    privileged: true
+    # Use image ENTRYPOINT/CMD (from Dockerfile.permissions) so the container can set permissions internally
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s

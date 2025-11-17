@@ -1,0 +1,116 @@
+# Multi-stage Dockerfile for Next.js with proper file permissions
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
+RUN \
+  if [ -f package-lock.json ]; then npm ci --only=production; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# =============================================================================
+# Development Stage with Fixed Permissions
+# =============================================================================
+FROM base AS development
+
+# Install additional tools for debugging
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# Create next.js user and group with specific UID/GID
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs --ingroup nodejs
+
+# Set proper ownership for the entire working directory
+RUN chown -R nextjs:nodejs /app
+
+# Install dependencies as root first
+COPY package.json package-lock.json* ./
+RUN npm ci && \
+    chown -R nextjs:nodejs /app/node_modules && \
+    chown -R nextjs:nodejs /app/package*.json
+
+# Copy source code and set proper ownership
+COPY . .
+RUN chown -R nextjs:nodejs /app
+
+# Set proper permissions for all files and directories
+RUN find /app -type d -exec chmod 755 {} \; && \
+    find /app -type f -exec chmod 644 {} \; && \
+    chmod 755 /app/node_modules/.bin/* && \
+    chmod +x /app/node_modules/.bin/*
+
+# Create .next directory with proper ownership for development builds
+RUN mkdir -p /app/.next && \
+    chown -R nextjs:nodejs /app/.next && \
+    chmod -R 755 /app/.next
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3000 || exit 1
+
+# Start Next.js in development mode
+CMD ["npm", "run", "dev"]
+
+# =============================================================================
+# Production Stage
+# =============================================================================
+FROM base AS production
+
+WORKDIR /app
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+
+# Create next.js user and group
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs --ingroup nodejs
+
+# Copy dependencies from deps stage
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Copy source code
+COPY --chown=nextjs:nodejs . .
+
+# Build the application as nextjs user
+USER nextjs
+RUN npm run build
+
+# Switch back to root for final setup
+USER root
+
+# Ensure proper permissions on built files
+RUN chown -R nextjs:nodejs /app/.next && \
+    chmod -R 755 /app/.next
+
+# Final switch to nextjs user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3000 || exit 1
+
+# Start the application
+CMD ["npm", "start"]
